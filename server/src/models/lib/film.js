@@ -15,4 +15,8 @@ const FilmSchema = mongoose.Schema({
     actors: [{ type: String }]
 });
 
+FilmSchema.plugin(autoIncrement, {
+    inc_field: 'film_id'
+});
+
 module.exports.Film = mongoose.model('Film', FilmSchema);
