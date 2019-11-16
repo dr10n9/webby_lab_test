@@ -28,11 +28,17 @@ router.get('/', async (req, res) => {
     let page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
     let limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : config.PAGINATION_LIMIT;
     try {
-        let list = await model.paginate({}, {
-            select: '-actors',
+        let options = {
+            select: '-actors -_id -uearOfIssue',
             page: page,
             limit: limit
-        });
+        }
+        if(config.parseBoolean(req.query.sort)) {
+            options.sort = {
+                name: 1
+            }
+        }
+        let list = await model.paginate({}, options);
         if (list.docs.length == 0) {
             return res.status(404).json({
                 mes: 'wrong params or films doesn\'t exists'
