@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
                 name: req.body.name,
                 format: req.body.format.trim(),
                 yearOfIssue: req.body.yearOfIssue,
-                actors: req.body.actors
+                actors: req.body.actors.split(', ')
             });
             console.log(req.body.yearOfIssue instanceof Date);
             return res.json(film);
