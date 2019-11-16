@@ -17,6 +17,7 @@ app.use(bodyParser.urlencoded({
 
 app.use('/api', routes.Api);
 app.use('/films', routes.Film);
+app.use('/search', routes.Search);
 
 app.listen(config.PORT, async (err) => {
     if(err) console.log(err);
