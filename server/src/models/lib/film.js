@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-sequence')(mongoose);
+const paginate = require('mongoose-paginate');
 
 const FilmSchema = mongoose.Schema({
     name: {
@@ -18,5 +19,7 @@ const FilmSchema = mongoose.Schema({
 FilmSchema.plugin(autoIncrement, {
     inc_field: 'film_id'
 });
+
+FilmSchema.plugin(paginate);
 
 module.exports.Film = mongoose.model('Film', FilmSchema);
