@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const routes = require('./routes');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
+const path = require('path');
 
 const config = require('./config');
 
@@ -13,11 +13,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(express.static(path.join(__dirname, 'build')));
 
 
 app.use('/api', routes.Api);
-app.use('/films', routes.Film);
-app.use('/search', routes.Search);
+// app.use('/films', routes.Film);
+// app.use('/search', routes.Search);
 
 app.listen(config.PORT, async (err) => {
     if(err) console.log(err);
@@ -33,3 +34,7 @@ app.listen(config.PORT, async (err) => {
         }
     }
 });
+
+// app.get('*', (req, res) => {
+//     return res.sendFile(path.join(__dirname, 'build/index.html'));
+// });
