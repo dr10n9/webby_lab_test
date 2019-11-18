@@ -11,8 +11,10 @@ router.get('/:id', async (req, res) => {
             if (film == undefined) return res.status(404).json({
                 mes: `no film with id = ${req.params.id}`
             });
+            // film.actors = film.actors.join(', ');
             return res.status(200).json(film);
         } catch (error) {
+            console.log(error);
             return res.status(500).json({
                 error: error
             });
@@ -27,6 +29,7 @@ router.get('/:id', async (req, res) => {
 router.get('/', async (req, res) => {
     let page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
     let limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : config.PAGINATION_LIMIT;
+    console.log(req.query)
     try {
         let options = {
             select: '-actors -_id -uearOfIssue',
@@ -34,6 +37,7 @@ router.get('/', async (req, res) => {
             limit: limit
         }
         if(config.parseBoolean(req.query.sort)) {
+            // console.log('sor/t = true')
             options.sort = {
                 name: 1
             }
@@ -62,7 +66,7 @@ router.post('/', async (req, res) => {
                 yearOfIssue: req.body.yearOfIssue,
                 actors: req.body.actors.split(', ')
             });
-            console.log(req.body.yearOfIssue instanceof Date);
+            // console.log(req.body.yearOfIssue instanceof Date);
             return res.json(film);
         } catch (error) {
             console.log(error);
@@ -83,6 +87,9 @@ router.patch('/:id', async (req, res) => {
                 error: 'wrong format'
             });
         }
+        console.log(req.body.actors);
+        req.body.actors = req.body.actors[0].split(', ');
+
         let film = await model.findOneAndUpdate({
             film_id: req.params.id
         }, req.body);
@@ -91,6 +98,7 @@ router.patch('/:id', async (req, res) => {
                 mes: `no film with id = ${req.params.id}`
             });
         }
+        console.log(film);
         return res.status(200).json(film);
     } else {
         return res.status(500).json({
