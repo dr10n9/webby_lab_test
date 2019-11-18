@@ -8,7 +8,7 @@ const FilmSchema = mongoose.Schema({
         required: true
     },
     yearOfIssue: {
-        type: Date
+        type: Number
     },
     format: {
         type: String
