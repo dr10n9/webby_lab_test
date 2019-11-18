@@ -6,4 +6,8 @@ router.get('/', (req, res) => {
     });
 })
 
+router.use('/films', require('./film').router);
+router.use('/search', require('./search').router);
+router.use('/upload', require('./upload').router);
+
 module.exports.router = router;
