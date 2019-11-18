@@ -19,22 +19,32 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.use('/api', routes.Api);
 // app.use('/films', routes.Film);
 // app.use('/search', routes.Search);
-
-app.listen(config.PORT, async (err) => {
-    if(err) console.log(err);
-    else {
-        console.log(`listening on ${config.PORT}`);
-        try {
-            let connection = mongoose.connect(config.DATABASE_URI, {
-                useNewUrlParser: true
-            });
-            console.log('connected');
-        } catch (error) {  
-            console.log(error);
+if(process.env.NODE_ENV !== "TEST") {
+    app.listen(config.PORT, async (err) => {
+        if(err) console.log(err);
+        else {
+            console.log(`listening on ${config.PORT}`);
+            try {
+                let connection = mongoose.connect(config.DATABASE_URI, {
+                    useNewUrlParser: true
+                }, (err) => {
+                    if(err) console.log(err);
+                    else app.emit('app started');
+                });
+                console.log('connected');
+            } catch (error) {  
+                console.log(error);
+            }
         }
-    }
+    });
+}
+
+
+
+app.get('*', (req, res) => {
+    return res.sendFile(path.join(__dirname, 'build/index.html'));
 });
 
-// app.get('*', (req, res) => {
-//     return res.sendFile(path.join(__dirname, 'build/index.html'));
-// });
+module.exports = {
+    app
+};

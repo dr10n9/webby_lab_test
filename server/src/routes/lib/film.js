@@ -58,6 +58,7 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
+    console.log(req.body);
     if(verifyFormat(req.body.format)) {
         try {
             let film = await model.create({
@@ -88,7 +89,8 @@ router.patch('/:id', async (req, res) => {
             });
         }
         console.log(req.body.actors);
-        req.body.actors = req.body.actors[0].split(', ');
+        req.body.actors = req.body.actors.split(', ');
+        console.log('!!!', req.body);
 
         let film = await model.findOneAndUpdate({
             film_id: req.params.id
