@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from '../utils/axios';
 import { Link } from 'react-router-dom';
-import FilmsList from './filmsList';
 import { MDBBtn, MDBListGroup, MDBFormInline } from 'mdbreact';
 import { ListGroup } from 'react-bootstrap';
 
@@ -14,14 +13,15 @@ class Search extends React.Component {
             result: [],
             page: 0,
             pages: 0,
-            searchingBy: ''
+            searchingBy: '',
+            typingStarted: false
         };
 
     }
 
     handleActorName = (event) => {
-        console.log(this);
         this.setState({
+            typingStarted: true,
             actorName: event.target.value,
             page: 1
         }, () => {
@@ -31,6 +31,7 @@ class Search extends React.Component {
 
     handleFilmName = (event) => {
         this.setState({
+            typingStarted: true,
             filmName: event.target.value,
             page: 1
         }, () => {
@@ -44,6 +45,7 @@ class Search extends React.Component {
         }, () => {
             axios.get(`/search/searchByName?name=${this.state.filmName}&page=${page > 0 ? page : 1}`)
                 .then(data => {
+                    console.log(data);
                     let tmp = data.data.docs.map(el => {
                         return (
                             <div key={el.film_id}>
@@ -111,25 +113,43 @@ class Search extends React.Component {
         this.setState({
             page: this.state.page + 1
         }, () => {
-            if (this.state.searchingBy == 'actor') this.searchByActorName(this.state.page, true);
+            if (this.state.searchingBy === 'actor') this.searchByActorName(this.state.page, true);
             else this.searchByFilmName(this.state.page, true);
         });
 
+    }
+
+    renderResult = () => {
+        if (!this.state.typingStarted) {
+            return <div>Start typing to search</div>
+        } else {
+            if (this.state.result.length === 0) {
+                return <div>Nothing found</div>
+            } else {
+                return (
+                    <div>
+                        <MDBListGroup>
+                            {this.state.result}
+                        </MDBListGroup>
+                        { this.canLoadMore() }
+                    </div>
+                    
+                )
+
+            }
+        }
     }
 
     render() {
         return (
             <div>
                 <MDBFormInline className="md-form">
-                    <input className="form-control form-control-sm ml-3 w-75" type="text" placeholder="FilmName" aria-label="Search" 
-                        onChange={this.handleFilmName}/>
-                    <input className="form-control form-control-sm ml-3 w-75" type="text" placeholder="ActorName" aria-label="Search" 
+                    <input className="form-control form-control-sm ml-3 w-75" type="text" placeholder="FilmName" aria-label="Search"
+                        onChange={this.handleFilmName} />
+                    <input className="form-control form-control-sm ml-3 w-75" type="text" placeholder="ActorName" aria-label="Search"
                         onChange={this.handleActorName} />
                 </MDBFormInline>
-                <MDBListGroup>
-                    {this.state.result}
-                </MDBListGroup>
-                {this.canLoadMore()}
+                {this.renderResult()}
             </div>
         )
     }

@@ -1,26 +1,27 @@
 import React from "react";
 import { Form as BForm, Button } from "react-bootstrap";
 import axios from '../utils/axios';
-import {Redirect} from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import {setActors, setFormat, setId, setName, setYear} from '../store/actions/currentFilm';
+import { setActors, setFormat, setId, setName, setYear } from '../store/actions/currentFilm';
 
 class Form extends React.Component {
     constructor(props) {
-        console.log(props.match);
         super(props);
         console.log(this.props.currentFilm);
+        console.log('MODE', this.props.mode);
         this.state = {
             id: this.props.id ? this.props.id : null,
             name: '',
             format: '',
             actors: '',
             yearOfIssue: 0,
-            mode: this.props.mode
+            mode: this.props.mode,
+            done: false
         };
         console.log(this.state);
-        if(this.props.id > 0) {
+        if (this.props.id > 0) {
             axios.get(`/films/${this.state.id}`)
                 .then(data => {
                     console.log(data);
@@ -31,7 +32,7 @@ class Form extends React.Component {
         }
     }
 
-    sendCreateRequest = async () => { 
+    sendCreateRequest = async () => {
         try {
             let response = await axios.post('/films', {
                 name: this.state.name,
@@ -40,38 +41,41 @@ class Form extends React.Component {
                 actors: this.state.actors
             });
             console.log(response);
-            if(response.data.test === false) {
+            if (response.data.test === false) {
                 console.log('format');
             }
             else {
                 this.setState({
-                    created: true,
-                    id: response.data.film_id
+                    id: response.data.film_id,
+                    done: true
                 });
             }
-            
+
         } catch (error) {
             alert('error occured, check devtools console');
             console.log(error);
-        } 
+        }
     }
 
     sendEditRequest = async () => {
         try {
             let response = await axios.patch(`/films/${this.props.currentFilm.id}`, this.props.currentFilm);
             console.log(response);
+            this.setState({
+                done: true
+            });
         } catch (error) {
             console.log(error);
         }
     }
 
     activateButton = () => {
-        if(this.state.mode == 'create') {
+        if (this.state.mode == 'create') {
             return (
                 <Button variant="outline-primary" onClick={this.sendCreateRequest}>Create</Button>
             )
         }
-        else {        
+        else {
             return (
                 <Button variant="outline-primary" onClick={this.sendEditRequest}>Edit</Button>
             )
@@ -98,7 +102,7 @@ class Form extends React.Component {
         });
         this.props.currentFilm.format = event.target.value;
     }
-    
+
     onActorsChanged = (event) => {
         this.setState({
             actors: event.target.value
@@ -107,8 +111,8 @@ class Form extends React.Component {
     }
 
     render() {
-        if(this.state.created) {
-            return <Redirect to={`/films/${this.state.id}`}/>
+        if(this.state.done) {
+            return (<Redirect to={`/films/${this.state.id}`} />)
         }
         return (
             <div>
@@ -117,13 +121,13 @@ class Form extends React.Component {
                         <BForm.Label>Film name</BForm.Label>
                         <BForm.Control type="text" placeholder="Titanic" onChange={this.onNameChanged} value={
                             this.state.mode != 'create' ? this.props.currentFilm.name : null
-                        }/>
+                        } />
                     </BForm.Group>
                     <BForm.Group>
                         <BForm.Label>Year of issue</BForm.Label>
                         <BForm.Control type="number" placeholder="1997" onChange={this.onYearChanged} value={
                             this.state.mode != 'create' ? this.props.currentFilm.yearOfIssue : null
-                        }/>
+                        } />
                     </BForm.Group>
                     <BForm.Group controlId="exampleBForm.ControlSelect1">
                         <BForm.Label>Format</BForm.Label>
@@ -139,7 +143,7 @@ class Form extends React.Component {
                         <BForm.Label>Actors</BForm.Label>
                         <BForm.Control type="text" placeholder="Kate Winslet, Leonardo DiCaprio" onChange={this.onActorsChanged} value={
                             this.state.mode != 'create' ? this.props.currentFilm.actors : null
-                        }/>
+                        } />
                     </BForm.Group>
                     {this.activateButton()}
                 </BForm>

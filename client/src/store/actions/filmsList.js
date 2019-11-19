@@ -17,3 +17,17 @@ export function clearFilms() {
         type: 'CLEAR_FILMS'
     }
 }
+
+export function setPage(page) {
+    return {
+        type: 'SET_PAGE',
+        payload: page
+    }
+}
+
+export function setPages(pages) {
+    return {
+        type: 'SET_PAGES',
+        payload: pages
+    }
+}

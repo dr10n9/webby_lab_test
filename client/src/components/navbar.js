@@ -38,9 +38,6 @@ class Navbar extends React.Component {
                                 <Nav.Link as={NavLink} to="/upload">
                                         Upload
                                 </Nav.Link>
-                                <Nav.Link as={NavLink} to="/form">
-                                    Form
-                                </Nav.Link>
                             </Nav>
                         </BNavbar.Collapse>
                     </BNavbar>

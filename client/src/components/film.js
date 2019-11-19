@@ -29,15 +29,13 @@ class Film extends React.Component {
                     name: data.data.name,
                     yearOfIssue: data.data.yearOfIssue,
                     format: data.data.format,
-                    actors: data.data.actors.map(el => {
-                        return <ListGroup.Item key={el._id}>{el}</ListGroup.Item>
-                    })
+                    actors: data.data.actors
                 });
                 this.props.setIdAction(data.data.film_id);
                 this.props.setNameAction(data.data.name);
                 this.props.setYearAction(data.data.yearOfIssue);
                 this.props.setFormatAction(data.data.format);
-                this.props.setActorsAction(data.data.actors);
+                this.props.setActorsAction(data.data.actors.join(', '));
                 console.log(this.props);
             })
             .catch(err => {
@@ -47,8 +45,7 @@ class Film extends React.Component {
 
     deleteFilm = () => {
         axios.delete(`/films/${this.state.id}`)
-            .then(data => {
-                console.log(data);
+            .then(async data => {
                 this.setState({
                     deleted: true
                 });
@@ -85,7 +82,9 @@ class Film extends React.Component {
                             {this.state.yearOfIssue} | {this.state.format}
                         </Card.Subtitle>
                         <ListGroup>
-                            {this.state.actors}
+                            {this.state.actors.map((el, i) => {
+                                return <ListGroup.Item key={i}>{el}</ListGroup.Item>
+                            })}
                         </ListGroup>
                         <ButtonGroup>
                             <Button variant="outline-info" onClick={this.editFilm}>Edit</Button>
@@ -101,7 +100,8 @@ class Film extends React.Component {
 
 const mapToStateProps = store => {
     return {
-        currentFilm: store.currentFilm
+        currentFilm: store.currentFilm,
+        filmsList: store.filmsList
     }
 }
 
