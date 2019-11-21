@@ -3,10 +3,10 @@ import axios from '../utils/axios';
 import {
     Redirect,
 } from 'react-router-dom'
-import { Card, ListGroup, Button, ButtonGroup } from 'react-bootstrap';
+import { Card, ListGroup, Button, ButtonGroup, Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import {setActors, setFormat, setId, setName, setYear} from '../store/actions/currentFilm';
+import { setActors, setFormat, setId, setName, setYear } from '../store/actions/currentFilm';
 
 class Film extends React.Component {
     constructor(props) {
@@ -20,7 +20,8 @@ class Film extends React.Component {
             format: 'VHS',
             err: false,
             deleted: false,
-            editing: false
+            editing: false,
+            modal: false
         };
         axios.get(`/films/${this.state.id}`)
             .then(data => {
@@ -44,9 +45,25 @@ class Film extends React.Component {
     }
 
     deleteFilm = () => {
+        this.setState({
+            modal: true
+        })
+        // axios.delete(`/films/${this.state.id}`)
+        //     .then(async data => {
+        //         this.setState({
+        //             deleted: true
+        //         });
+        //     })
+        //     .catch(err => {
+        //         console.log(err);
+        //     });
+    }
+
+    submitDelete = () => {
         axios.delete(`/films/${this.state.id}`)
             .then(async data => {
                 this.setState({
+                    modal: false,
                     deleted: true
                 });
             })
@@ -60,20 +77,20 @@ class Film extends React.Component {
             editing: true
         });
     }
-    
+
     render() {
-        if(this.state.deleted) {
+        if (this.state.deleted) {
             return <Redirect to="/films" />
         }
-        if(this.state.editing) {
+        if (this.state.editing) {
             return <Redirect to={{
                 pathname: `/edit/${this.state.id}`,
                 mode: 'edit',
             }} />
         }
-        return(
+        return (
             <div>
-                <Card style={{width: '18rem'}}>
+                <Card style={{ width: '18rem' }}>
                     <Card.Body>
                         <Card.Title>
                             {this.state.name}
@@ -92,6 +109,26 @@ class Film extends React.Component {
                         </ButtonGroup>
                     </Card.Body>
                 </Card>
+                <Modal
+                    show={this.state.modal}
+                    dialogClassName="modal-90w"
+                    onHide={() => this.setState({ modal: false })}
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>
+                            Submit delete action
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Are you sure?</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.setState({modal: false})}>
+                            Cancel
+                        </Button>
+                        <Button variant="danger" onClick={this.submitDelete}>
+                            Delete
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         );
     }
@@ -111,7 +148,7 @@ const mapDispatchToActions = dispatch => {
         setFormatAction: format => dispatch(setFormat(format)),
         setYearAction: year => dispatch(setYear(year)),
         setActorsAction: actors => dispatch(setActors(actors)),
-        setIdAction: id => {console.log('setIdAction: ', id); dispatch(setId(id))}
+        setIdAction: id => { console.log('setIdAction: ', id); dispatch(setId(id)) }
     };
 };
 

@@ -10,7 +10,7 @@ import Film from './film.js';
 import FilmsList from './filmsList';
 import Search from './search';
 import Upload from '../utils/upload';
-import Form from './form';
+import MyForm from './form';
 
 import { Navbar as BNavbar, Nav, Jumbotron } from 'react-bootstrap'
 
@@ -50,9 +50,9 @@ class Navbar extends React.Component {
                             <Route path="/search" component={Search}></Route>
                             <Route path="/upload" component={Upload}></Route>
                             <Route path="/form">
-                                <Form mode={'create'}/>
+                                <MyForm mode={'create'}/>
                             </Route>
-                            <Route path="/edit/:id" component={Form}>
+                            <Route path="/edit/:id" component={MyForm}>
                                 {/* <Form mode={'edit'} /> */}
                             </Route>
                             <Route path="/">

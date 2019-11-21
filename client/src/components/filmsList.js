@@ -31,6 +31,7 @@ class FilmsList extends React.Component {
     loadFilms = (page, more = false) => {
         axios.get(`/films/?page=${page}&sort=${this.state.sort}`)
             .then(data => {
+                console.log(data);
                 if (more) {
                     this.setState({
                         films: this.state.films.concat(data.data.docs)
@@ -39,7 +40,7 @@ class FilmsList extends React.Component {
                     this.setState({
                         films: data.data.docs,
                         page: data.data.page,
-                        totalPages: data.data.pages
+                        totalPages: data.data.totalPages
                     });
                 }
             })
