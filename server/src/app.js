@@ -17,8 +17,6 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 
 app.use('/api', routes.Api);
-// app.use('/films', routes.Film);
-// app.use('/search', routes.Search);
 if(process.env.NODE_ENV !== "TEST") {
     app.listen(config.PORT, async (err) => {
         if(err) console.log(err);
@@ -26,7 +24,9 @@ if(process.env.NODE_ENV !== "TEST") {
             console.log(`listening on ${config.PORT}`);
             try {
                 let connection = mongoose.connect(config.DATABASE_URI, {
-                    useNewUrlParser: true
+                    useNewUrlParser: true,
+                    useFindAndModify: true,
+                    useUnifiedTopology: true
                 }, (err) => {
                     if(err) console.log(err);
                     else app.emit('app started');
