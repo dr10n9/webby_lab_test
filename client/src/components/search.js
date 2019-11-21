@@ -59,7 +59,7 @@ class Search extends React.Component {
                     this.setState({
                         result: tmp,
                         page: data.data.page,
-                        pages: data.data.pages
+                        pages: data.data.totalPages
                     });
                 })
                 .catch(err => {
