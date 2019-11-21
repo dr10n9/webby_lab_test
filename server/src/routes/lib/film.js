@@ -23,7 +23,7 @@ router.get('/:id', async (req, res) => {
         return res.status(400).json({
             mes: `id must be specified or be positive integer`
         });
-    }   
+    }
 });
 
 router.get('/', async (req, res) => {
@@ -32,16 +32,19 @@ router.get('/', async (req, res) => {
     console.log(req.query)
     try {
         let options = {
-            select: '-actors -_id -uearOfIssue',
+            select: '-actors -_id -yearOfIssue',
             page: page,
             limit: limit
         }
-        if(config.parseBoolean(req.query.sort)) {
-            // console.log('sor/t = true')
+        if (config.parseBoolean(req.query.sort)) {
+            options.collation = {
+                locale: 'en'
+            };
             options.sort = {
                 name: 1
-            }
+            };
         }
+        console.log(options);
         let list = await model.paginate({}, options);
         if (list.docs.length == 0) {
             return res.status(404).json({
@@ -59,43 +62,57 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     console.log(req.body);
-    if(verifyFormat(req.body.format)) {
-        try {
-            let film = await model.create({
-                name: req.body.name,
-                format: req.body.format.trim(),
-                yearOfIssue: req.body.yearOfIssue,
-                actors: req.body.actors.split(', ')
-            });
-            // console.log(req.body.yearOfIssue instanceof Date);
-            return res.json(film);
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({
-                error: error
-            });
-        }
+
+    req.body.name = req.body.name.trim();
+    req.body.format = req.body.format.trim();
+    req.body.actors = config.sortActors(req.body.actors.split(',').map(el => el.trim()));
+    try {
+        let check = await model.findOne(req.body);
+        if (check != undefined) return res.status(409).json({
+            err: 'This film already exists',
+            film: check
+        })
+    } catch (error) {
+        console.log(err);
     }
-    return res.json({
-        test: verifyFormat(req.body.format)
-    })
+    try {
+        console.log(req.body);
+        let film = await model.create({
+            name: req.body.name,
+            format: req.body.format,
+            yearOfIssue: req.body.yearOfIssue,
+            actors: req.body.actors
+        });
+        return res.json(film);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            error: error
+        });
+    }
 });
 
 router.patch('/:id', async (req, res) => {
-    if(parseInt(req.params.id)) {
-        if(req.body.format) {
-            if(!verifyFormat(req.body.format)) return res.status(400).json({
-                error: 'wrong format'
-            });
+    if (parseInt(req.params.id)) {
+        delete req.body.id;
+        req.body.name = req.body.name.trim();
+        req.body.format = req.body.format.trim();
+        req.body.actors = config.sortActors(req.body.actors.split(',').map(el => el.trim()));
+        try {
+            let check = await model.findOne(req.body);
+            console.log(`PATCH /${req.params.id}`);
+            console.log('CHECK:', check, '\nreq.body: ', req.body);
+            if (check != undefined) return res.status(409).json({
+                err: 'This film already exists',
+                film: check
+            })
+        } catch (error) {
+            console.log(err);
         }
-        console.log(req.body.actors);
-        req.body.actors = req.body.actors.split(', ');
-        console.log('!!!', req.body);
-
         let film = await model.findOneAndUpdate({
             film_id: req.params.id
         }, req.body);
-        if(film == undefined) {
+        if (film == undefined) {
             return res.status(404).json({
                 mes: `no film with id = ${req.params.id}`
             });
