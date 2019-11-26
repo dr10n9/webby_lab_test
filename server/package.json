@@ -6,7 +6,8 @@
   "scripts": {
     "test": "NODE_ENV=\"TEST\" nyc --reporter=html --reporter=text mocha ./src/test/*.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js"
   },
   "author": "",
   "license": "ISC",
