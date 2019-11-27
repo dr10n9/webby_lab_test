@@ -7,8 +7,11 @@ class Upload extends React.Component {
         super(props);
         this.state = {
             selectedFile: null,
-            modal: false,
-            count: ''
+            modal: {
+                title: '',
+                body: '',
+                show: false
+            },
         }
     }
 
@@ -24,32 +27,54 @@ class Upload extends React.Component {
         event.preventDefault();
         event.stopPropagation();
 
-        if(this.state.selectedFile == undefined) {
-            return alert("No file selected");
+        if (this.state.selectedFile == undefined) {
+            this.setState({
+                modal: {
+                    show: true,
+                    title: 'Error',
+                    body: 'No file selected'
+                }
+            });
         }
 
         // check if file size is more than 5 mb
-        if(this.state.selectedFile.size > 5242880 ) {
-            return alert("File is too big (file should be < 5 mb)");
-        }
-
-        let data = new FormData();
-        data.append('file', this.state.selectedFile);
-        axios.post('/upload', data, {})
-            .then(data => {
-                console.log(data);
-                this.setState({
-                    modal: true,
-                    count: data.data.created
-                });
-            })
-            .catch(err => {
-                console.log(err);
+        else if (this.state.selectedFile.size > 5242880) {
+            this.setState({
+                modal: {
+                    show: true,
+                    title: 'Error',
+                    body: 'File size should be less then 5 mb'
+                }
             });
+        } else {
+            let data = new FormData();
+            data.append('file', this.state.selectedFile);
+            axios.post('/upload', data, {})
+                .then(data => {
+                    console.log(data);
+                    this.setState({
+                        modal: {
+                            show: true,
+                            title: 'Response',
+                            body: `${data.data.created} created, check DevTools for info`
+                        },
+                    });
+                })
+                .catch(err => {
+                    err = err.response.data;
+                    this.setState({
+                        modal: {
+                            show: true,
+                            title: `${err.type} error: ${err.code}`,
+                            body: err.message
+                        }
+                    })
+                });
+        }
     }
 
     fileName = () => {
-        if(this.state.selectedFile) {
+        if (this.state.selectedFile) {
             return this.state.selectedFile.name
         } else {
             return 'Choose file'
@@ -64,19 +89,17 @@ class Upload extends React.Component {
                     <button onClick={this.onClickHandler}>Upload</button>
                 </form>
                 <Modal
-                    show={this.state.modal}
+                    show={this.state.modal.show}
                     dialogClassName="modal-90w"
-                    // onHide={() => this.setState({ modal: false })}
                 >
                     <Modal.Header closeButton>
                         <Modal.Title>
-                            Response
-                            {/* Oops! You got {this.state.error.code} error! */}
+                            {this.state.modal.title}
                         </Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>{this.state.count} created, check DevTools for info</Modal.Body>
+                    <Modal.Body>{this.state.modal.body}</Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => this.setState({modal: false})}>
+                        <Button variant="secondary" onClick={() => this.setState({ modal: { show: false } })}>
                             Ok
                         </Button>
                     </Modal.Footer>
