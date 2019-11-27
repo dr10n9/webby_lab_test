@@ -24,6 +24,15 @@ class Upload extends React.Component {
         event.preventDefault();
         event.stopPropagation();
 
+        if(this.state.selectedFile == undefined) {
+            return alert("No file selected");
+        }
+
+        // check if file size is more than 5 mb
+        if(this.state.selectedFile.size > 5242880 ) {
+            return alert("File is too big (file should be < 5 mb)");
+        }
+
         let data = new FormData();
         data.append('file', this.state.selectedFile);
         axios.post('/upload', data, {})
