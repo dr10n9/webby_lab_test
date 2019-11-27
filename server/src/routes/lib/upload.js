@@ -14,6 +14,9 @@ router.post('/', upload.single('file'), (req, res) => {
 
     papaParse.parse(req.file.buffer.toString(), {
         complete: async (data) => {
+            if(data.errors.length != 0) {
+                return res.status(500).json(data.errors[0]);
+            }
             console.log(data);
             let response = [];
             for (let film of data.data) {
