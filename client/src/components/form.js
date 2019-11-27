@@ -48,6 +48,7 @@ class MyForm extends React.Component {
         console.log('mount');
         console.log(this.state.id);
         console.log(this.props.currentFilm);
+        if(this.state.mode == 'create') this.clearCurrentFilm();
     }
 
     componentWillUnmount() {
